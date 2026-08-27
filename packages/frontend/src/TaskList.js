@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   List, ListItem, ListItemText, IconButton, Checkbox, Typography, Box, CircularProgress, Paper, Chip
 } from '@mui/material';
+import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import EventIcon from '@mui/icons-material/Event';
@@ -52,6 +53,20 @@ function TaskList({ onEdit }) {
       fetchTasks();
     } catch (err) {
       setError('Failed to update task');
+    }
+  };
+
+  const handlePriorityChange = async (task, newPriority) => {
+    if (!newPriority) return;
+    try {
+      await fetch(`/api/tasks/${task.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priority: newPriority })
+      });
+      fetchTasks();
+    } catch (err) {
+      setError('Failed to update priority');
     }
   };
 
@@ -127,7 +142,7 @@ function TaskList({ onEdit }) {
           <ListItem 
             key={task.id} 
             sx={{ 
-              pr: 18,
+              pr: 30,
               py: 1,
               mb: 1,
               borderRadius: 2,
@@ -220,6 +235,37 @@ function TaskList({ onEdit }) {
                   }}
                 />
               )}
+              <ToggleButtonGroup
+                value={task.priority || 'P3'}
+                exclusive
+                onChange={(e, val) => handlePriorityChange(task, val)}
+                size="small"
+                aria-label="task priority"
+              >
+                {['P1', 'P2', 'P3'].map(p => (
+                  <ToggleButton
+                    key={p}
+                    value={p}
+                    sx={{
+                      px: 1,
+                      py: 0.1,
+                      fontSize: '0.65rem',
+                      fontWeight: 600,
+                      minWidth: 28,
+                      color: '#7A7A7A',
+                      borderColor: '#7A7A7A',
+                      '&.Mui-selected': {
+                        background: '#07F2E6',
+                        color: 'white',
+                        borderColor: '#07F2E6',
+                        '&:hover': { background: '#05d9cf' },
+                      },
+                    }}
+                  >
+                    {p}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
               <Box 
                 sx={{ 
                   display: 'flex', 

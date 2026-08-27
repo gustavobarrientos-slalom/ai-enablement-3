@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Paper, Typography, Box } from '@mui/material';
+import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
 
@@ -7,6 +8,7 @@ function TaskForm({ onSave, initialTask }) {
   const [title, setTitle] = useState(initialTask?.title || '');
   const [description, setDescription] = useState(initialTask?.description || '');
   const [dueDate, setDueDate] = useState(initialTask?.due_date || '');
+  const [priority, setPriority] = useState(initialTask?.priority || 'P3');
   const [error, setError] = useState(null);
 
   // Helper to normalize date string to YYYY-MM-DD format
@@ -30,10 +32,12 @@ function TaskForm({ onSave, initialTask }) {
       setTitle(initialTask.title || '');
       setDescription(initialTask.description || '');
       setDueDate(normalizeDateString(initialTask.due_date));
+      setPriority(initialTask.priority || 'P3');
     } else {
       setTitle('');
       setDescription('');
       setDueDate('');
+      setPriority('P3');
     }
   }, [initialTask]);
 
@@ -44,10 +48,11 @@ function TaskForm({ onSave, initialTask }) {
       return;
     }
     setError(null);
-    await onSave({ title, description, due_date: dueDate });
+    await onSave({ title, description, due_date: dueDate, priority });
     setTitle('');
     setDescription('');
     setDueDate('');
+    setPriority('P3');
   };
 
   return (
@@ -144,6 +149,40 @@ function TaskForm({ onSave, initialTask }) {
           }}
         />
         {error && <Typography color="error" sx={{ fontWeight: 500, fontSize: '0.875rem' }}>{error}</Typography>}
+        <Box display="flex" alignItems="center" gap={1}>
+          <Typography variant="body2" sx={{ color: '#616161', fontWeight: 500, minWidth: 56 }}>Priority</Typography>
+          <ToggleButtonGroup
+            value={priority}
+            exclusive
+            onChange={(e, val) => val && setPriority(val)}
+            size="small"
+            aria-label="task priority"
+          >
+            {['P1', 'P2', 'P3'].map(p => (
+              <ToggleButton
+                key={p}
+                value={p}
+                data-testid={`priority-${p.toLowerCase()}`}
+                sx={{
+                  px: 1.5,
+                  py: 0.25,
+                  fontSize: '0.72rem',
+                  fontWeight: 600,
+                  color: '#7A7A7A',
+                  borderColor: '#7A7A7A',
+                  '&.Mui-selected': {
+                    background: '#07F2E6',
+                    color: 'white',
+                    borderColor: '#07F2E6',
+                    '&:hover': { background: '#05d9cf' },
+                  },
+                }}
+              >
+                {p}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+        </Box>
         <Box display="flex" gap={2}>
           <Button 
             type="submit" 

@@ -10,11 +10,11 @@ function App() {
 
   const handleSave = async (task) => {
     if (editingTask) {
-      // Edit existing task
+      const { title, description, due_date, priority } = task;
       await fetch(`/api/tasks/${editingTask.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(task)
+        body: JSON.stringify({ title, description, due_date, priority })
       });
       setEditingTask(null);
     } else {
